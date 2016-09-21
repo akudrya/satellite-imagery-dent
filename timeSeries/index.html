@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css' rel='stylesheet' />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+</head>
+
+<body onload="init();">
+    <div id="slider"></div>
+    <div id="map" style="width: 100%;top: 30px;bottom: 0;position: absolute;margin: 0;left: 0;right: 0;"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+    <script>
+    var vecLayers = [];
+    var mbUrl = 'https://{s}.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={token}';
+    var accessToken = 'pk.eyJ1IjoiYXN0cm9kaWdpdGFsIiwiYSI6ImNVb1B0ZkEifQ.IrJoULY2VMSBNFqHLrFYew';
+
+    function init() {
+        var lat = 35.6728076;
+        var lng = -118.45441818237306;
+        var zoom = 13;
+
+        var vecLayerID = [
+            "astrodigital.7kh8j8l7",
+            "astrodigital.51tyha2z",
+            "astrodigital.11fehwmr",
+            "astrodigital.96wu4na1",
+            "astrodigital.7763i3vp",
+            "astrodigital.7916xpn9",
+        ];
+
+        $(function() {
+            $("#slider").slider({
+                orientation: "horizontal",
+                range: "min",
+                max: 500,
+                value: 0,
+                slide: refresh,
+                change: refresh
+            });
+        });
+
+        map = L.map('map').setView([lat, lng], zoom);
+
+        L.tileLayer(mbUrl, {
+            maxZoom: 18,
+            id: 'astrodigital.00ffdda1',
+            token: accessToken
+        }).addTo(map);
+
+        for (var i = 0; i < vecLayerID.length; i++) {
+            var lay = L.tileLayer(mbUrl, {
+                maxZoom: 18,
+                id: vecLayerID[i],
+                token: accessToken
+            });
+            vecLayers.push(lay);
+            lay.setZIndex(-i).addTo(map);
+        }
+    }
+
+    function refresh() {
+        var ind = Math.floor(vecLayers.length * $("#slider").slider("value") / 500);
+
+        for (var i = 0; i < vecLayers.length; i++) {
+            if (i == ind) {
+                vecLayers[i].setZIndex(100);
+            }
+        }
+        for (var i = 0; i < vecLayers.length; i++) {
+            if (i != ind) {
+                vecLayers[i].setZIndex(0);
+            }
+        }
+    }
+    </script>
+</body>
+
+</html>
